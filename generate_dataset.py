@@ -1,16 +1,4 @@
-"""
-generate_dataset.py
--------------------
-Generates IEEE 39-bus fault dataset with 156 features:
-    vm_0...vm_38  (39 voltage magnitudes)
-    va_0...va_38  (39 voltage angles, radians)  <- ESSENTIAL for physics loss
-    p_0...p_38    (39 active power, per-unit)
-    q_0...q_38    (39 reactive power, per-unit)
 
-Run: python generate_dataset.py
-Output: final_data/ieee39_final_dataset.csv
-        final_data/ieee39_physics.npz
-"""
 
 import sys
 import io
@@ -137,7 +125,7 @@ def compute_features(V, Ybus):
     I  = Ybus @ V
     S  = V * np.conj(I)
     Vm = np.abs(V)
-    Va = np.angle(V)           # radians — essential for physics loss
+    Va = np.angle(V)           
     P  = np.real(S) / BASE_MVA
     Q  = np.imag(S) / BASE_MVA
     return Vm, Va, P, Q

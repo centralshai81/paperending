@@ -1,13 +1,3 @@
-"""
-train_pinn.py  (with progress bars and hardware detection)
-----------------------------------------------------------
-Two-phase PINN training.
-Shows: hardware info, ETA per epoch, batch progress bar, live loss values.
-
-Requirements:
-    pip install tqdm
-"""
-
 import sys
 import io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')

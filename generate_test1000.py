@@ -1,13 +1,3 @@
-"""
-generate_test1000.py
---------------------
-Extracts 1000+ test samples (200 per class x 5 classes = 1000 total)
-from your training dataset with high model confidence.
-
-Run: python generate_test1000.py
-Output: TEST_1000.csv
-"""
-
 import sys
 import io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
