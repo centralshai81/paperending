@@ -3,10 +3,6 @@ import torch
 
 
 def build_Ybus(n_bus, branches, baseMVA=100):
-    """
-    Build nodal admittance matrix from branch data.
-    Handles transformer tap ratios and 1-indexed bus numbers.
-    """
     Ybus = np.zeros((n_bus, n_bus), dtype=np.complex128)
     for branch in branches:
         fbus  = int(branch[0]) - 1    # 1-indexed -> 0-indexed
@@ -28,10 +24,7 @@ def compute_power_injections(V, Ybus):
 
 
 def simulate_fault(V_normal, Ybus, fault_bus, fault_type, Rf=0.01, Xf=0.01):
-    """
-    Simulate a short-circuit fault.
-    LLG uses 2*Yf diagonal (distinct from LL which uses 1*Yf).
-    """
+   
     n_bus = len(V_normal)
     Zf    = Rf + 1j * Xf
     Yf    = (1.0 / Zf) if abs(Zf) > 1e-10 else 1e10
@@ -64,21 +57,7 @@ def simulate_fault(V_normal, Ybus, fault_bus, fault_type, Rf=0.01, Xf=0.01):
 
 def physics_loss_fn(Vm_hat, Va_hat, P_meas, Q_meas,
                     Ybus_input, lambda_physics=0.01):
-    """
-    Physics residual loss.
-
-    Penalises the model when its predicted (Vm_hat, Va_hat) imply
-    power injections that differ from the measured (P_meas, Q_meas).
-
-    With voltage angles stored in the dataset, this residual is near
-    zero for correct predictions, enabling effective PINN training.
-
-    Feature layout expected by train_pinn.py:
-        X[:, 0  :39 ] = vm
-        X[:, 39 :78 ] = va    <- stored angles, NOT passed here
-        X[:, 78 :117] = p     <- P_meas
-        X[:, 117:156] = q     <- Q_meas
-    """
+    
     device = Vm_hat.device
 
     if not torch.is_tensor(Ybus_input):
@@ -101,10 +80,7 @@ def physics_loss_fn(Vm_hat, Va_hat, P_meas, Q_meas,
 
 
 def compute_power_injections_tensor(V_tensor, Ybus_tensor):
-    """
-    Compute P and Q from complex voltages.
-    Pure PyTorch — gradients flow correctly through this function.
-    """
+   
     I_tensor = torch.matmul(V_tensor, Ybus_tensor.t())
     S_tensor = V_tensor * torch.conj(I_tensor)
     P = torch.real(S_tensor).float()

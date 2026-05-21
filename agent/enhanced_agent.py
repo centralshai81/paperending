@@ -101,7 +101,7 @@ _KNOWLEDGE: Dict[str, str] = {
 
 
 def _classify_intent(question: str) -> str:
-    """Return the best-matching intent label, or 'unknown'."""
+    
     q = question.strip()
     for intent, patterns in _INTENT_PATTERNS:
         for pat in patterns:
@@ -125,13 +125,6 @@ def _fault_type_summary(fc: dict, total: int) -> str:
         if cnt:
             lines.append(f"  · {name}（{key}）: {cnt} 个（{_pct(cnt, total)}）")
     return "\n".join(lines) if lines else "  · 无故障样本"
-
-
-def _top_buses_text(top_buses: list) -> str:
-    if not top_buses:
-        return "未检测到故障节点。"
-    parts = [f"#{b} 节点（{c} 次）" for b, c in top_buses[:5]]
-    return "故障频发节点依次为：" + "、".join(parts) + "。"
 
 
 def _dominant_fault(fc: dict) -> str:
@@ -316,7 +309,7 @@ class EnhancedDiagnosisAgent:
 
     def answer_question(self, question: str,
                         batch_result: Optional[Dict] = None) -> Dict:
-        """Local intent-based Q&A — no external API calls."""
+        
         intent = _classify_intent(question)
 
         # Knowledge questions never need batch data
@@ -446,7 +439,7 @@ class EnhancedDiagnosisAgent:
         )}
 
     def answer_knowledge(self, q: str) -> Optional[Dict]:
-        """Kept for backward compatibility."""
+    
         intent = _classify_intent(q)
         if intent.startswith("know_"):
             return {"answer": _KNOWLEDGE[intent]}

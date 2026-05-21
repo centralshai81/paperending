@@ -73,7 +73,6 @@ def evaluate(model, loader, device):
 
 def run_epoch(model, loader, criterion, optimizer,
               Ybus_tensor, lambda_physics, device, label):
-    """One training epoch with tqdm batch progress bar."""
     model.train()
     sum_cls = sum_phys = 0.0
     n_correct = n_total = 0
@@ -194,9 +193,7 @@ def train():
     best_val_acc = 0.0
     t_train_start = time.time()
 
-    # ══════════════════════════════════════════════════════════
-    # PHASE 1  —  Classification only
-    # ══════════════════════════════════════════════════════════
+# PHASE 1  —  Classification only
     print("\n" + "=" * 60)
     print("PHASE 1: Classification only")
     print("=" * 60)
@@ -250,9 +247,8 @@ def train():
     )
     model = model.to(device)
 
-    # ══════════════════════════════════════════════════════════
+  
     # PHASE 2  —  Classification + Physics
-    # ══════════════════════════════════════════════════════════
     print("\n" + "=" * 60)
     print("PHASE 2: Classification + Physics loss")
     print("  Lambda warmup: 0.0001 -> 0.001")
