@@ -164,20 +164,23 @@ def train():
     print(f"     Features: {X_all.shape[1]}  (should be 156)")
     print(f"     Classes : {np.bincount(y_all)}")
 
-    # ── Split
+    # ── Split (8:1:1)
     np.random.seed(42)
-    idx   = np.random.permutation(len(X_all))
-    n_val = int(0.1 * len(X_all))
-    v_idx = idx[:n_val]
-    t_idx = idx[n_val:]
+    idx    = np.random.permutation(len(X_all))
+    n_val  = int(0.1 * len(X_all))
+    n_test = int(0.1 * len(X_all))
+    v_idx  = idx[:n_val]
+    te_idx = idx[n_val:n_val+n_test]
+    t_idx  = idx[n_val+n_test:]
 
     BATCH = 1024
     train_loader = DataLoader(FaultDataset(X_all[t_idx], y_all[t_idx]),
                               batch_size=BATCH, shuffle=True,  num_workers=0)
     val_loader   = DataLoader(FaultDataset(X_all[v_idx], y_all[v_idx]),
                               batch_size=2048,  shuffle=False, num_workers=0)
-    print(f"\n     Train   : {len(t_idx):,}  |  Val: {len(v_idx):,}")
-    print(f"     Batches : {len(train_loader)} per epoch")
+    test_loader  = DataLoader(FaultDataset(X_all[te_idx], y_all[te_idx]),
+                              batch_size=2048,  shuffle=False, num_workers=0)
+    print(f"\n     Train   : {len(t_idx):,}  |  Val: {len(v_idx):,}  |  Test: {len(te_idx):,}")
 
     # ── Ybus
     Ybus_tensor = load_ybus().to(device)
@@ -185,7 +188,7 @@ def train():
 
     # ── Model
     model    = PINNMultiClass(in_dim=156, n_bus=39, n_classes=5,
-                              hidden=128, depth=3).to(device)
+                              hidden=128, depth=5).to(device)
     criterion = nn.CrossEntropyLoss()
     n_params  = sum(p.numel() for p in model.parameters())
     print(f"[OK] Model ready  ({n_params:,} parameters)")
@@ -193,7 +196,7 @@ def train():
     best_val_acc = 0.0
     t_train_start = time.time()
 
-# PHASE 1  —  Classification only
+    # PHASE 1  —  Classification only
     print("\n" + "=" * 60)
     print("PHASE 1: Classification only")
     print("=" * 60)
@@ -201,8 +204,8 @@ def train():
     opt1   = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
     sched1 = optim.lr_scheduler.ReduceLROnPlateau(opt1, patience=5,
                                                    factor=0.5, min_lr=1e-5)
-    P1_EPOCHS   = 80
-    P1_PATIENCE = 15
+    P1_EPOCHS   = 100
+    P1_PATIENCE = 20
     p1_wait     = 0
     t1 = time.time()
 
@@ -257,8 +260,8 @@ def train():
     opt2   = optim.Adam(model.parameters(), lr=2e-4, weight_decay=1e-4)
     sched2 = optim.lr_scheduler.ReduceLROnPlateau(opt2, patience=8,
                                                    factor=0.5, min_lr=1e-6)
-    P2_EPOCHS   = 100
-    P2_PATIENCE = 20
+    P2_EPOCHS   = 300
+    P2_PATIENCE = 100
     p2_wait     = 0
     t2 = time.time()
 

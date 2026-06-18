@@ -5,7 +5,7 @@ import torch.nn as nn
 class PINNMultiClass(nn.Module):
     
     def __init__(self, in_dim=156, n_bus=39, n_classes=5,
-                 hidden=128, depth=3, dropout=0.1):
+                 hidden=128, depth=5, dropout=0.1):
         super().__init__()
         layers = []
         d = in_dim

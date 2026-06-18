@@ -284,14 +284,20 @@ async function handleFile(file) {
     if (!d.success) { alert('上传失败: ' + d.error); return; }
     uploadedFeatures = d.features;
     uploadedSamples  = d.samples;
+    
+    // 根据后端返回的 detected_format 字段决定提示文字
+    const fmtLabel = d.detected_format === '156' 
+        ? '156 列新格式' 
+        : '117 列旧格式，已自动补齐相角';
+    
     const badge = document.getElementById('sampleBadge');
-    badge.textContent = `✓ 已载入 ${d.total_samples} 个样本`;
+    badge.textContent = `✓ 已载入 ${d.total_samples} 个样本（${fmtLabel}）`;
     badge.style.display = 'block';
     document.getElementById('btnAnalyze').disabled = false;
     uploadZone.querySelector('strong').textContent = file.name;
-    uploadZone.querySelector('p').textContent = `${d.total_samples} 个样本 · 准备就绪`;
-  } catch (e) { alert('网络错误: ' + e.message); }
-  finally { hideLoading(); }
+    uploadZone.querySelector('p').textContent = `${d.total_samples} 个样本 · ${fmtLabel} · 准备就绪`;
+} catch (e) { alert('网络错误: ' + e.message); }
+finally { hideLoading(); }
 }
 
 async function runBatchAnalyze() {

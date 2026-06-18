@@ -61,11 +61,13 @@ def upload_file_v2():
         if has_va:
             va_cols        = [f'va_{i}' for i in range(39)]
             feature_cols   = vm_cols + va_cols + p_cols + q_cols  # 156
+            detected_format = '156'
             print("[OK] 156-feature format detected (vm+va+p+q)")
         else:
             # Old 117-feature format — add zero angles
             va_cols      = None
             feature_cols = vm_cols + p_cols + q_cols               # 117
+            detected_format = '117'
             print("[WARN] 117-feature format — va columns missing, using zeros")
 
         # Verify columns exist
@@ -98,10 +100,11 @@ def upload_file_v2():
         print(f"[OK] {len(samples)} samples, {len(features[0])} features each")
 
         return jsonify({
-            'success'      : True,
-            'total_samples': len(samples),
-            'samples'      : samples,
-            'features'     : features,
+            'success'        : True,
+            'total_samples'  : len(samples),
+            'detected_format': detected_format,
+            'samples'        : samples,
+            'features'       : features,
         })
 
     except Exception as e:
